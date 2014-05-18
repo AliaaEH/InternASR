@@ -22,6 +22,7 @@
 		2A79872B1928C50000E78192 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A79870A1928C50000E78192 /* UIKit.framework */; };
 		2A7987331928C50000E78192 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2A7987311928C50000E78192 /* InfoPlist.strings */; };
 		2A7987351928C50000E78192 /* First_PrototypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7987341928C50000E78192 /* First_PrototypeTests.m */; };
+		2A79873F1928C91300E78192 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A79873E1928C91300E78192 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		2A7987301928C50000E78192 /* First PrototypeTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "First PrototypeTests-Info.plist"; sourceTree = "<group>"; };
 		2A7987321928C50000E78192 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		2A7987341928C50000E78192 /* First_PrototypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = First_PrototypeTests.m; sourceTree = "<group>"; };
+		2A79873E1928C91300E78192 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A79873F1928C91300E78192 /* AVFoundation.framework in Frameworks */,
 				2A7987091928C50000E78192 /* CoreGraphics.framework in Frameworks */,
 				2A79870B1928C50000E78192 /* UIKit.framework in Frameworks */,
 				2A7987071928C50000E78192 /* Foundation.framework in Frameworks */,
@@ -103,6 +106,7 @@
 		2A7987051928C50000E78192 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2A79873E1928C91300E78192 /* AVFoundation.framework */,
 				2A7987061928C50000E78192 /* Foundation.framework */,
 				2A7987081928C50000E78192 /* CoreGraphics.framework */,
 				2A79870A1928C50000E78192 /* UIKit.framework */,
@@ -202,6 +206,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Aliaa Essameldin";
 				TargetAttributes = {
+					2A7987021928C50000E78192 = {
+						DevelopmentTeam = DCSL538YF4;
+					};
 					2A7987261928C50000E78192 = {
 						TestTargetID = 2A7987021928C50000E78192;
 					};
@@ -390,10 +397,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "First Prototype/First Prototype-Prefix.pch";
 				INFOPLIST_FILE = "First Prototype/First Prototype-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -403,10 +413,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "First Prototype/First Prototype-Prefix.pch";
 				INFOPLIST_FILE = "First Prototype/First Prototype-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
