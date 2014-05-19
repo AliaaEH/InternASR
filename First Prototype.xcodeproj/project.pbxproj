@@ -23,6 +23,8 @@
 		2A7987331928C50000E78192 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2A7987311928C50000E78192 /* InfoPlist.strings */; };
 		2A7987351928C50000E78192 /* First_PrototypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7987341928C50000E78192 /* First_PrototypeTests.m */; };
 		2A79873F1928C91300E78192 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A79873E1928C91300E78192 /* AVFoundation.framework */; };
+		2AA78D54192A6DA500E58300 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA78D53192A6DA500E58300 /* AudioToolbox.framework */; };
+		2AA78D5F192A74D700E58300 /* Slt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA78D5C192A74D700E58300 /* Slt.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,8 @@
 		2A7987321928C50000E78192 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		2A7987341928C50000E78192 /* First_PrototypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = First_PrototypeTests.m; sourceTree = "<group>"; };
 		2A79873E1928C91300E78192 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		2AA78D53192A6DA500E58300 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		2AA78D5C192A74D700E58300 /* Slt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Slt.framework; path = ../../Downloads/OpenEarsDistribution/Framework/Slt.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +68,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2AA78D5F192A74D700E58300 /* Slt.framework in Frameworks */,
+				2AA78D54192A6DA500E58300 /* AudioToolbox.framework in Frameworks */,
 				2A79873F1928C91300E78192 /* AVFoundation.framework in Frameworks */,
 				2A7987091928C50000E78192 /* CoreGraphics.framework in Frameworks */,
 				2A79870B1928C50000E78192 /* UIKit.framework in Frameworks */,
@@ -106,6 +112,8 @@
 		2A7987051928C50000E78192 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2AA78D5C192A74D700E58300 /* Slt.framework */,
+				2AA78D53192A6DA500E58300 /* AudioToolbox.framework */,
 				2A79873E1928C91300E78192 /* AVFoundation.framework */,
 				2A7987061928C50000E78192 /* Foundation.framework */,
 				2A7987081928C50000E78192 /* CoreGraphics.framework */,
@@ -399,6 +407,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/aliaaessameldin/Downloads/OpenEarsDistribution/Framework,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "First Prototype/First Prototype-Prefix.pch";
 				INFOPLIST_FILE = "First Prototype/First Prototype-Info.plist";
@@ -415,6 +427,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/aliaaessameldin/Downloads/OpenEarsDistribution/Framework,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "First Prototype/First Prototype-Prefix.pch";
 				INFOPLIST_FILE = "First Prototype/First Prototype-Info.plist";
@@ -483,6 +499,7 @@
 				2A79873A1928C50000E78192 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2A79873B1928C50000E78192 /* Build configuration list for PBXNativeTarget "First PrototypeTests" */ = {
 			isa = XCConfigurationList;
@@ -491,6 +508,7 @@
 				2A79873D1928C50000E78192 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
