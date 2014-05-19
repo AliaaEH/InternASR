@@ -176,9 +176,28 @@
 /* SECTION C : sending sound to server */
 -(IBAction)send: (id)sender
 {
-	NSData *data = [[NSData alloc] initWithContentsOfURL: recorder.url];
+    if (!recorder.recording){
+        player = [[AVAudioPlayer alloc] initWithContentsOfURL:recorder.url error:nil];
+        [player setDelegate:self];
+        [player play];
+    } else {
+        NSLog(@"Error: Sound file not found");
+    }
+    
+    NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
+    //convert int to NSData
+    int i = sizeof(data_body);
+    
+    NSData *data = [NSData dataWithBytes: &i length: sizeof(data_body)];
+    
+    //if you get the audio data as a buffer of bytes and the size as int ... the two code snippets above should do the necessary work for you ;)
+    
+    NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
+    
+    [outputStream write:[size bytes] maxLength:[data length]];
     [outputStream write:[data bytes] maxLength:[data length]];
 }
+
 
 - (void)didReceiveMemoryWarning
 {
