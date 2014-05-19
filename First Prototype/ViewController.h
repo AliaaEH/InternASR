@@ -12,7 +12,7 @@
 #define IP_ADDRESS @"localhost";
 #define PORT_NUMBER 80
 
-@interface ViewController : UIViewController <AVAudioRecorderDelegate, AVAudioPlayerDelegate>
+@interface ViewController : UIViewController <NSStreamDelegate, AVAudioRecorderDelegate, AVAudioPlayerDelegate>
 
 {
     /* SECTION A */

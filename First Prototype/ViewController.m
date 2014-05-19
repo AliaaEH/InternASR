@@ -12,7 +12,7 @@
 
 @end
 
-@implementation ViewController
+@implementation ViewController 
 
 - (void)viewDidLoad
 {
@@ -22,6 +22,7 @@
     // Disable Stop/Play button when application launches
     [_stopRecordButton setEnabled:NO];
     [_playRecordButton setEnabled:NO];
+    [_sendButton setEnabled:NO];
     
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
@@ -108,6 +109,8 @@
 /* SECTION B : sound recording */
 -(IBAction)startRecord: (id)sender
 {
+    [_sendButton setEnabled:YES];
+    
     // Stop the audio player before recording
     if (player.playing) {
         [player stop];
@@ -164,12 +167,14 @@
 /* SECTION C : sending sound to server */
 -(IBAction)send: (id)sender
 {
-
+	NSData *data = [[NSData alloc] initWithContentsOfURL: recorder.url];
+    [outputStream write:[data bytes] maxLength:[data length]];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+    
     // Dispose of any resources that can be recreated.
 }
 
