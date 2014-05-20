@@ -20,9 +20,8 @@
     
     /* Setting up for SECTION B */
     // Disable Stop/Play button when application launches
-    [_stopRecordButton setEnabled:NO];
     [_playRecordButton setEnabled:NO];
-    [_sendButton setEnabled:NO];
+
     
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
@@ -53,12 +52,10 @@
     recorder.meteringEnabled = YES;
     
     [recorder prepareToRecord];
+    streamIsOpen = NO;
 }
 
 /* SECTION A: Connecting to the server */
-- (IBAction)connect:(id)sender{
-    [self initNetworkCommunication];
-}
 
 //This function initiates streaming
 - (void)initNetworkCommunication {
@@ -106,6 +103,7 @@
                         
                         if (nil != output) {
                             NSLog(@"server said: %@", output);
+                            inputText.text = [NSString stringWithFormat:@"%@", output];
                         }
                     }
                 }
@@ -128,8 +126,14 @@
 /* SECTION B : sound recording */
 -(IBAction)startRecord: (id)sender
 {
-    [_sendButton setEnabled:YES];
- 
+    //initializing connection once
+    if (!streamIsOpen)
+    {
+        NSLog(@"Connecting");
+        [self initNetworkCommunication];
+        streamIsOpen = YES; 
+    }
+    
     
     // Stop the audio player before recording
     if (player.playing) {
@@ -137,6 +141,7 @@
     }
         
     if (!recorder.recording) {
+        NSLog(@"Recording");
         AVAudioSession *session = [AVAudioSession sharedInstance];
         [session setActive:YES error:nil];
             
@@ -144,40 +149,40 @@
         [recorder record];
         [_startRecordButton setTitle:@"Pause" forState:UIControlStateNormal];
         [_playRecordButton setEnabled:YES];
-        
-        AudioQueueLevelMeterState meters[1];
-        UInt32 dlen = sizeof(meters);
-        OSStatus Status AudioQueueGetProperty(inAQ,kAudioQueueProperty_CurrentLevelMeterDB,meters,&dlen);
-        if(meters[0].mPeakPower < _threshold)
-        { // NSLog(@"Silence detected");
-        }
+
         
     } else {
         // Pause recording
-        [recorder pause];
+        NSLog(@"Sending");
+        [recorder stop];
         [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
+        //send recording
+        NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
+        //convert int to NSData
+        int i = [data_body length];
+        if (i%2 != 0)
+        {
+            i--;
+        }
+        NSLog(@"%d", i);
+        
+        //if you get the audio data as a buffer of bytes and the size as int ... the two code snippets above should do the necessary work for you ;)
+        
+        NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
+        
+        NSMutableData *packet = [[NSMutableData alloc] init];
+        [packet appendData:size];
+        [packet appendData:data_body];
+        
+        
+        [outputStream write:[packet bytes] maxLength:[packet length]];
     }
     
-    [_stopRecordButton setEnabled:YES];
     [_playRecordButton setEnabled:NO];
     
     
 }
 
--(IBAction)stopRecord: (id)sender
-{
-    [recorder stop];
-    
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setActive:NO error:nil];
-}
-
-- (void) audioRecorderDidFinishRecording:(AVAudioRecorder *)avrecorder successfully:(BOOL)flag{
-    [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
-    
-    [_stopRecordButton setEnabled:NO];
-    [_playRecordButton setEnabled:YES];
-}
 
 -(IBAction)playRecord: (id)sender
 {
@@ -189,32 +194,6 @@
         NSLog(@"Error: Sound file not found"); 
     }
 
-}
-
-/* SECTION C : sending sound to server */
--(IBAction)send: (id)sender
-{
-    
-    NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
-    //convert int to NSData
-    int i = [data_body length];
-    if (i%2 != 0)
-    {
-        i--;
-    }
-    NSLog(@"%d", i);
-    
-    //if you get the audio data as a buffer of bytes and the size as int ... the two code snippets above should do the necessary work for you ;)
-    
-    NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
-    
-    NSMutableData *packet = [[NSMutableData alloc] init];
-    [packet appendData:size];
-    [packet appendData:data_body];
-    
-    
-    [outputStream write:[packet bytes] maxLength:[packet length]];
-    //[outputStream write:[data_body bytes] maxLength:[data_body length]];
 }
 
 
