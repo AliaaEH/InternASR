@@ -27,7 +27,7 @@
     // Set the audio file
     NSArray *pathComponents = [NSArray arrayWithObjects:
                                [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
-                               @"MyAudioMemo.m4a", //we want to later change that to wav
+                               @"MyAudioMemo.wav", //we want to later change that to wav
                                nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
     
@@ -36,12 +36,17 @@
     [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
     
     // Define the recorder setting
-    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
-    
-    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatMPEG4AAC] forKey:AVFormatIDKey];
-    [recordSetting setValue:[NSNumber numberWithFloat:16000.0] forKey:AVSampleRateKey];
-    [recordSetting setValue:[NSNumber numberWithInt: 1] forKey:AVNumberOfChannelsKey];
-    
+    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                          [NSNumber numberWithFloat:16000.0], AVSampleRateKey,
+                                          [NSNumber numberWithInt: kAudioFormatLinearPCM], AVFormatIDKey,
+                                          [NSNumber numberWithInt:16], AVEncoderBitDepthHintKey,
+                                          [NSNumber numberWithInt:16], AVEncoderBitRateKey,
+                                          [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
+                                          [NSNumber numberWithBool:NO], AVLinearPCMIsBigEndianKey,
+                                          [NSNumber numberWithBool:NO], AVLinearPCMIsFloatKey,
+                                          [NSNumber numberWithInt: AVAudioQualityHigh], AVEncoderAudioQualityKey,
+                                          nil];
+ 
     // Initiate and prepare the recorder
     recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
     recorder.delegate = self;
@@ -59,7 +64,7 @@
    
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
-    CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"94.125.228.197", PORT_NUMBER, &readStream, &writeStream);
+    CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"localhost", 12345, &readStream, &writeStream);
     //FIX THE INSANE MACRO HERE
     inputStream = (__bridge NSInputStream *)readStream;
     outputStream = (__bridge NSOutputStream *)writeStream;
@@ -82,6 +87,10 @@
 			NSLog(@"Stream opened");
 			break;
             
+        case NSStreamEventHasSpaceAvailable:
+            NSLog(@"Sending Audio");
+            break;
+            
 		case NSStreamEventHasBytesAvailable:
 			if (theStream == inputStream) {
                 
@@ -92,7 +101,7 @@
                     len = [inputStream read:buffer maxLength:sizeof(buffer)];
                     if (len > 0) {
                         
-                        NSString *output = [[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding];
+                        NSString *output = [[NSString alloc] initWithBytes:buffer length:len encoding:NSUTF8StringEncoding];
                         
                         if (nil != output) {
                             NSLog(@"server said: %@", output);
@@ -119,6 +128,7 @@
 -(IBAction)startRecord: (id)sender
 {
     [_sendButton setEnabled:YES];
+ 
     
     // Stop the audio player before recording
     if (player.playing) {
@@ -132,10 +142,10 @@
         // Start recording
         [recorder record];
         [_startRecordButton setTitle:@"Pause" forState:UIControlStateNormal];
+        [_playRecordButton setEnabled:YES];
             
     } else {
         // Pause recording
-        
         [recorder pause];
         [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
     }
@@ -176,26 +186,27 @@
 /* SECTION C : sending sound to server */
 -(IBAction)send: (id)sender
 {
-    if (!recorder.recording){
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:recorder.url error:nil];
-        [player setDelegate:self];
-        [player play];
-    } else {
-        NSLog(@"Error: Sound file not found");
-    }
     
     NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
     //convert int to NSData
-    int i = sizeof(data_body);
-    
-    NSData *data = [NSData dataWithBytes: &i length: sizeof(data_body)];
+    int i = [data_body length];
+    if (i%2 != 0)
+    {
+        i--;
+    }
+    NSLog(@"%d", i);
     
     //if you get the audio data as a buffer of bytes and the size as int ... the two code snippets above should do the necessary work for you ;)
     
     NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
     
-    [outputStream write:[size bytes] maxLength:[data length]];
-    [outputStream write:[data bytes] maxLength:[data length]];
+    NSMutableData *packet = [[NSMutableData alloc] init];
+    [packet appendData:size];
+    [packet appendData:data_body];
+    
+    
+    [outputStream write:[packet bytes] maxLength:[packet length]];
+    //[outputStream write:[data_body bytes] maxLength:[data_body length]];
 }
 
 
