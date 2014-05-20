@@ -51,6 +51,7 @@
     recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
     recorder.delegate = self;
     recorder.meteringEnabled = YES;
+    
     [recorder prepareToRecord];
 }
 
@@ -143,7 +144,14 @@
         [recorder record];
         [_startRecordButton setTitle:@"Pause" forState:UIControlStateNormal];
         [_playRecordButton setEnabled:YES];
-            
+        
+        AudioQueueLevelMeterState meters[1];
+        UInt32 dlen = sizeof(meters);
+        OSStatus Status AudioQueueGetProperty(inAQ,kAudioQueueProperty_CurrentLevelMeterDB,meters,&dlen);
+        if(meters[0].mPeakPower < _threshold)
+        { // NSLog(@"Silence detected");
+        }
+        
     } else {
         // Pause recording
         [recorder pause];
