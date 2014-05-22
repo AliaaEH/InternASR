@@ -18,20 +18,15 @@
 {
     [super viewDidLoad];
     
-    /* Setting up for SECTION B */
-    // Disable Stop/Play button when application launches
-    [_playRecordButton setEnabled:NO];
-
-    
-    // Set the audio file
+    // Set the audio recorder
     NSArray *pathComponents = [NSArray arrayWithObjects:
                                [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
-                               @"MyAudioMemo.wav", //we want to later change that to wav
+                               @"MyAudioMemo.wav", 
                                nil];
     NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
     
     // Setup audio session
-    AVAudioSession *session = [AVAudioSession sharedInstance];
+    session = [AVAudioSession sharedInstance];
     [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
     
     // Define the recorder setting
@@ -50,16 +45,20 @@
     recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
     recorder.delegate = self;
     recorder.meteringEnabled = YES;
-    
     [recorder prepareToRecord];
+    
+    //setting up timer for silence detector
+    leveltimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector: @selector(silenceDetector:) userInfo:nil repeats:YES];
+    hold = NO;
+    paused = NO;
     streamIsOpen = NO;
+    textViewer.text = @" ";
 }
 
-/* SECTION A: Connecting to the server */
+// ------------------------------------- SETTING UP SOCKET STREAMING ---------------------------------------//
 
-//This function initiates streaming
-- (void)initNetworkCommunication {
-   
+- (void)initNetworkCommunication
+{
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"localhost", 12345, &readStream, &writeStream);
@@ -77,7 +76,7 @@
     [outputStream open];
 }
 
-//Defining the behavior of the stream
+//handling stream events
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
 	switch (streamEvent) {
             
@@ -86,7 +85,6 @@
 			break;
             
         case NSStreamEventHasSpaceAvailable:
-            NSLog(@"Sending Audio");
             break;
             
 		case NSStreamEventHasBytesAvailable:
@@ -103,7 +101,7 @@
                         
                         if (nil != output) {
                             NSLog(@"server said: %@", output);
-                            inputText.text = [NSString stringWithFormat:@"%@", output];
+                            [self displayText:output];
                         }
                     }
                 }
@@ -115,6 +113,8 @@
 			break;
             
 		case NSStreamEventEndEncountered:
+            //terminate previous connection before starting a new one
+            NSLog(@"closing connection wrong");
 			break;
             
 		default:
@@ -123,79 +123,122 @@
     
 }
 
-/* SECTION B : sound recording */
+
+- (void)silenceDetector:(NSTimer *)timer
+{
+    if(recorder.recording)
+    {
+        if (hold == NO)
+        {
+            //first time to check for silence should happen 3 seconds into the recording
+            NSLog(@"waiting");
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:3]];
+            hold = YES;
+        }
+        
+        [recorder updateMeters];
+        peakInput.text = [NSString stringWithFormat:@"%f", [recorder peakPowerForChannel:0]];
+        
+        if ( (paused== YES || ([recorder peakPowerForChannel:0] > -65 && [recorder peakPowerForChannel:0] < -50) ))
+        {
+            [self restartRecording];
+        }
+    }
+}
+
+
+// --------------------------------------- SETTING UP RECORDER'S BEHAVIOR -----------------------------------------//
+
 -(IBAction)startRecord: (id)sender
 {
-    //initializing connection once
-    if (!streamIsOpen)
+    if (inputStream)
     {
-        NSLog(@"Connecting");
-        [self initNetworkCommunication];
-        streamIsOpen = YES; 
+        //terminate previous connection before starting a new one
+        NSLog(@"CLOSING");
+        [outputStream close];
+        [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                                forMode:NSDefaultRunLoopMode];
+        [inputStream close];
+        [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                               forMode:NSDefaultRunLoopMode];
+        
+        outputStream = nil;
+        inputStream = nil;
     }
     
-    
-    // Stop the audio player before recording
-    if (player.playing) {
-        [player stop];
-    }
+    [self initNetworkCommunication]; //establish connection
         
     if (!recorder.recording) {
+        //initiate recording session
         NSLog(@"Recording");
-        AVAudioSession *session = [AVAudioSession sharedInstance];
         [session setActive:YES error:nil];
-            
+        
         // Start recording
         [recorder record];
         [_startRecordButton setTitle:@"Pause" forState:UIControlStateNormal];
-        [_playRecordButton setEnabled:YES];
+        paused = NO;
 
-        
-    } else {
-        // Pause recording
-        NSLog(@"Sending");
-        [recorder stop];
-        [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
-        //send recording
-        NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
-        //convert int to NSData
-        int i = [data_body length];
-        if (i%2 != 0)
-        {
-            i--;
-        }
-        NSLog(@"%d", i);
-        
-        //if you get the audio data as a buffer of bytes and the size as int ... the two code snippets above should do the necessary work for you ;)
-        
-        NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
-        
-        NSMutableData *packet = [[NSMutableData alloc] init];
-        [packet appendData:size];
-        [packet appendData:data_body];
-        
-        
-        [outputStream write:[packet bytes] maxLength:[packet length]];
     }
-    
-    [_playRecordButton setEnabled:NO];
-    
-    
+    else {
+        paused = YES; 
+    }
 }
 
-
--(IBAction)playRecord: (id)sender
+- (void)restartRecording
 {
-    if (!recorder.recording){
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:recorder.url error:nil];
-        [player setDelegate:self];
-        [player play];
-    } else {
-        NSLog(@"Error: Sound file not found"); 
+    //stop recorder
+    NSLog(@"stopping");
+    [recorder stop];
+    [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
+    //[session setActive:NO error:nil];
+    
+    //extracting recording size
+    NSLog(@"Sending To Server");
+    //NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
+    NSArray *pathComponents = [NSArray arrayWithObjects:
+                               [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
+                               @"Syria.wav",
+                               nil];
+    NSURL *file_url = [NSURL fileURLWithPathComponents:pathComponents];
+    
+    NSData *data_body = [[NSData alloc] initWithContentsOfURL: file_url];
+    
+    //convert int to NSData
+    int i = [data_body length];
+    if (i%2 != 0) //size must be even (server expectation
+    {
+        i--;
     }
-
+    NSLog(@"%d", i);
+    NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
+    
+    //creating and sending packet
+    NSMutableData *packet = [[NSMutableData alloc] init];
+    [packet appendData:size];
+    [packet appendData:data_body];
+    [outputStream write:[packet bytes] maxLength:[packet length]];
+    
+    //restart the silence detector's 3 seconds hold
+    hold = NO;
 }
 
+// --------------------------------------- RECEIVING AND HANDLING TEXT -----------------------------------------//
+-(void)displayText:(NSString *)reply
+{
+    //parsing input
+    NSArray *lines = [[NSArray alloc] initWithArray:[reply componentsSeparatedByString:@"\n"]];
+    NSArray *parser = [[NSArray alloc] init];
+    NSString *input = @"";
+    
+    for (int i = 0; i<([parser count] - 1); i++)
+    {
+        parser = [[NSArray alloc] initWithArray:[lines[i] componentsSeparatedByString:@" "]];
+        input = [NSString stringWithFormat:@"%@ %@", input, parser[1]];
+    }
+
+    //displaying new text
+    textViewer.text = [NSString stringWithFormat:@"%@ %@", textViewer.text, input];
+}
 
 - (void)didReceiveMemoryWarning
 {

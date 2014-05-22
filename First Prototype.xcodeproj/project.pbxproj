@@ -24,7 +24,6 @@
 		2A7987351928C50000E78192 /* First_PrototypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7987341928C50000E78192 /* First_PrototypeTests.m */; };
 		2A79873F1928C91300E78192 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A79873E1928C91300E78192 /* AVFoundation.framework */; };
 		2AA78D54192A6DA500E58300 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA78D53192A6DA500E58300 /* AudioToolbox.framework */; };
-		2AA78D5F192A74D700E58300 /* Slt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA78D5C192A74D700E58300 /* Slt.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,7 +67,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2AA78D5F192A74D700E58300 /* Slt.framework in Frameworks */,
 				2AA78D54192A6DA500E58300 /* AudioToolbox.framework in Frameworks */,
 				2A79873F1928C91300E78192 /* AVFoundation.framework in Frameworks */,
 				2A7987091928C50000E78192 /* CoreGraphics.framework in Frameworks */,

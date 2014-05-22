@@ -18,20 +18,23 @@
     /* SECTION A */
     NSInputStream *inputStream;
     NSOutputStream *outputStream;
-    IBOutlet UILabel *inputText;
+    IBOutlet UITextView *textViewer;
     BOOL streamIsOpen;
     
     /* SECTION B */
+    AVAudioSession *session; 
     AVAudioRecorder *recorder;
     AVAudioPlayer *player;
+    NSTimer *leveltimer;
+    BOOL hold;
+    BOOL paused; 
+    IBOutlet UILabel *peakInput;
     
 }
 
 @property(weak, nonatomic) IBOutlet UIButton *startRecordButton;
-@property(weak, nonatomic) IBOutlet UIButton *playRecordButton;
 
 -(IBAction)startRecord: (id)sender;
--(IBAction)playRecord: (id)sender;
 
 
 @end
