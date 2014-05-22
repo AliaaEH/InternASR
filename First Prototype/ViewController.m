@@ -23,14 +23,14 @@
                                [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
                                @"MyAudioMemo.wav", 
                                nil];
-    NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
+    outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
     
     // Setup audio session
     session = [AVAudioSession sharedInstance];
     [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
     
     // Define the recorder setting
-    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+    recordSetting = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                           [NSNumber numberWithFloat:16000.0], AVSampleRateKey,
                                           [NSNumber numberWithInt: kAudioFormatLinearPCM], AVFormatIDKey,
                                           [NSNumber numberWithInt:16], AVEncoderBitDepthHintKey,
@@ -97,25 +97,25 @@
                     len = [inputStream read:buffer maxLength:sizeof(buffer)];
                     if (len > 0) {
                         
-                        NSString *output = [[NSString alloc] initWithBytes:buffer length:len encoding:NSUTF8StringEncoding];
+                        NSString *input = [[NSString alloc] initWithBytes:buffer length:len encoding:NSUTF8StringEncoding];
                         
-                        if (nil != output) {
-                            NSLog(@"server said: %@", output);
-                            [self displayText:output];
+                        if (nil != input) {
+                            NSLog(@"server said: %@", input);
+                            [self displayText:input];
                         }
                     }
                 }
             }
-            break;
             
+            
+            break;
+    
 		case NSStreamEventErrorOccurred:
 			NSLog(@"Can not connect to the host!");
 			break;
             
 		case NSStreamEventEndEncountered:
-            //terminate previous connection before starting a new one
-            NSLog(@"closing connection wrong");
-			break;
+            break;
             
 		default:
 			NSLog(@"Unknown event");
@@ -141,6 +141,9 @@
         
         if ( (paused== YES || ([recorder peakPowerForChannel:0] > -65 && [recorder peakPowerForChannel:0] < -50) ))
         {
+            [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
+            [recorder stop];
+            
             [self restartRecording];
         }
     }
@@ -151,24 +154,12 @@
 
 -(IBAction)startRecord: (id)sender
 {
-    if (inputStream)
-    {
-        //terminate previous connection before starting a new one
-        NSLog(@"CLOSING");
-        [outputStream close];
-        [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
-                                forMode:NSDefaultRunLoopMode];
-        [inputStream close];
-        [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
-                               forMode:NSDefaultRunLoopMode];
-        
-        outputStream = nil;
-        inputStream = nil;
-    }
-    
-    [self initNetworkCommunication]; //establish connection
-        
     if (!recorder.recording) {
+        
+        [self initNetworkCommunication]; //establish connection
+        
+        chopper = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector: @selector(chop) userInfo:nil repeats:YES];
+        
         //initiate recording session
         NSLog(@"Recording");
         [session setActive:YES error:nil];
@@ -184,24 +175,41 @@
     }
 }
 
+-(void)chop
+{
+    if(recorder.recording)
+    {
+        [recorder stop];
+        [self restartRecording];
+
+        // Initiate and prepare the recorder
+        recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
+        recorder.delegate = self;
+        recorder.meteringEnabled = YES;
+        [recorder prepareToRecord];
+        
+        [recorder record];
+    }
+}
+
 - (void)restartRecording
 {
     //stop recorder
     NSLog(@"stopping");
-    [recorder stop];
-    [_startRecordButton setTitle:@"Record" forState:UIControlStateNormal];
-    //[session setActive:NO error:nil];
+    //[recorder stop];
     
     //extracting recording size
     NSLog(@"Sending To Server");
-    //NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
-    NSArray *pathComponents = [NSArray arrayWithObjects:
+    NSData *data_body = [[NSData alloc] initWithContentsOfURL: recorder.url];
+    //Debugging
+    /*NSArray *pathComponents = [NSArray arrayWithObjects:
                                [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
-                               @"Syria.wav",
+                               @"Syria-clip6.wav",
                                nil];
+    
     NSURL *file_url = [NSURL fileURLWithPathComponents:pathComponents];
     
-    NSData *data_body = [[NSData alloc] initWithContentsOfURL: file_url];
+    NSData *data_body = [[NSData alloc] initWithContentsOfURL:file_url options:NSDataReadingUncached error:nil];*/
     
     //convert int to NSData
     int i = [data_body length];
@@ -209,6 +217,7 @@
     {
         i--;
     }
+    
     NSLog(@"%d", i);
     NSData *size = [NSData dataWithBytes: &i length: sizeof(i)];
     
@@ -216,7 +225,12 @@
     NSMutableData *packet = [[NSMutableData alloc] init];
     [packet appendData:size];
     [packet appendData:data_body];
-    [outputStream write:[packet bytes] maxLength:[packet length]];
+    
+    //while ([outputStream hasSpaceAvailable])
+    //{
+        [outputStream write:[packet bytes] maxLength:[packet length]];
+        
+    //}
     
     //restart the silence detector's 3 seconds hold
     hold = NO;

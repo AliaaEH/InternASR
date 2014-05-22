@@ -5,36 +5,36 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>765A178E-FD0F-4AB1-A6B9-53BABD32D368</string>
+	<string>5172E4A9-8BAE-4A1C-8C72-6E99E6E78157</string>
 	<key>IDESourceControlProjectName</key>
 	<string>First Prototype</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>7221149B-1D29-4B9F-84DC-1176B5DDD11E</key>
-		<string>ssh://github.com/AliaaEH/SpchRec.git</string>
+		<key>66914B59-132E-4ABE-AB22-EDED5A70B91E</key>
+		<string>ssh://github.com/AliaaEH/InternASR.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>First Prototype.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>7221149B-1D29-4B9F-84DC-1176B5DDD11E</key>
+		<key>66914B59-132E-4ABE-AB22-EDED5A70B91E</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/AliaaEH/SpchRec.git</string>
+	<string>ssh://github.com/AliaaEH/InternASR.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>7221149B-1D29-4B9F-84DC-1176B5DDD11E</string>
+	<string>66914B59-132E-4ABE-AB22-EDED5A70B91E</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>7221149B-1D29-4B9F-84DC-1176B5DDD11E</string>
+			<string>66914B59-132E-4ABE-AB22-EDED5A70B91E</string>
 			<key>IDESourceControlWCCName</key>
-			<string>First Prototype</string>
+			<string>InternASR</string>
 		</dict>
 	</array>
 </dict>

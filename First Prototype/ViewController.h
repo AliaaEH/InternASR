@@ -26,9 +26,15 @@
     AVAudioRecorder *recorder;
     AVAudioPlayer *player;
     NSTimer *leveltimer;
+    NSTimer *chopper;
     BOOL hold;
     BOOL paused; 
     IBOutlet UILabel *peakInput;
+    
+    NSMutableDictionary *recordSetting;
+    NSURL *outputFileURL;
+    
+    
     
 }
 

@@ -3,7 +3,7 @@ import socket
 import wave
 import time
 
-CHUNK = 1024
+CHUNK = 256
 CHANNELS = 1
 RATE = 16000
 WAVE_OUTPUT_FILENAME = "receivedAudio.wav"
@@ -12,7 +12,7 @@ frames = []
 
 
 HOST = ''                 # local host
-PORT = 1234
+PORT = 12346
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 
@@ -24,12 +24,12 @@ wf.setframerate(RATE)
 s.listen(1)
 conn, addr = s.accept()
 print ('Connected by', addr)
-data = conn.recv(1024)
+data = conn.recv(CHUNK)
 i=1
-#while True:
-while i<100: #MOSHKELA HENA
+while True: #MOSHKELA HENA
+    if not data: break
     i=i+1
-    data = conn.recv(1024)
+    data = conn.recv(CHUNK)
     if data != '':
         print(i)
         frames.append(data)
