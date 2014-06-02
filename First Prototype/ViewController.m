@@ -23,13 +23,17 @@
                                [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
                                @"MyAudioMemo.wav", 
                                nil];
+    
+    
+    /*Tryin http */
     outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
     
     // Setup audio session
     session = [AVAudioSession sharedInstance];
     [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-    
+
     // Define the recorder setting
+    
     recordSetting = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                           [NSNumber numberWithFloat:16000.0], AVSampleRateKey,
                                           [NSNumber numberWithInt: kAudioFormatLinearPCM], AVFormatIDKey,
@@ -61,11 +65,12 @@
 {
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
-    CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"localhost", 12345, &readStream, &writeStream);
+    CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)CFBridgingRetain([NSString stringWithFormat:@"%s", IP_ADDRESS]), PORT_NUMBER, &readStream, &writeStream);
     //FIX THE INSANE MACRO HERE
     inputStream = (__bridge NSInputStream *)readStream;
     outputStream = (__bridge NSOutputStream *)writeStream;
     
+          
     [inputStream setDelegate:self];
     [outputStream setDelegate:self];
     
@@ -225,12 +230,9 @@
     NSMutableData *packet = [[NSMutableData alloc] init];
     [packet appendData:size];
     [packet appendData:data_body];
-    
-    //while ([outputStream hasSpaceAvailable])
-    //{
-        [outputStream write:[packet bytes] maxLength:[packet length]];
-        
-    //}
+    [packet appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+
+    [outputStream write:[packet bytes] maxLength:[packet length]];
     
     //restart the silence detector's 3 seconds hold
     hold = NO;

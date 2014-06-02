@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-#define IP_ADDRESS @"localhost";
+#define IP_ADDRESS "localhost"
 #define PORT_NUMBER 12345
 
 @interface ViewController : UIViewController <NSStreamDelegate, AVAudioRecorderDelegate, AVAudioPlayerDelegate>
@@ -33,8 +33,6 @@
     
     NSMutableDictionary *recordSetting;
     NSURL *outputFileURL;
-    
-    
     
 }
 
