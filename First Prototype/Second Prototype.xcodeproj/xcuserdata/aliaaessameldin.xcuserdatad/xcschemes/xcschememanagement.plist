@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>First Prototype.xcscheme</key>
+		<key>Second Prototype.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,12 +12,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>2A7987021928C50000E78192</key>
+		<key>2ADE51CF193ADD8C006FD784</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>2A7987261928C50000E78192</key>
+		<key>2ADE51F0193ADD8C006FD784</key>
 		<dict>
 			<key>primary</key>
 			<true/>

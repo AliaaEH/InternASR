@@ -1,18 +1,18 @@
 //
-//  First_PrototypeTests.m
-//  First PrototypeTests
+//  Second_PrototypeTests.m
+//  Second PrototypeTests
 //
-//  Created by Aliaa Essameldin on 5/18/14.
+//  Created by Aliaa Essameldin on 6/1/14.
 //  Copyright (c) 2014 Aliaa Essameldin. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>
 
-@interface First_PrototypeTests : XCTestCase
+@interface Second_PrototypeTests : XCTestCase
 
 @end
 
-@implementation First_PrototypeTests
+@implementation Second_PrototypeTests
 
 - (void)setUp
 {

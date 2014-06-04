@@ -1,8 +1,8 @@
 //
 //  main.m
-//  First Prototype
+//  Second Prototype
 //
-//  Created by Aliaa Essameldin on 5/18/14.
+//  Created by Aliaa Essameldin on 6/1/14.
 //  Copyright (c) 2014 Aliaa Essameldin. All rights reserved.
 //
 
